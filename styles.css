@@ -490,6 +490,15 @@ a { text-decoration: none; color: inherit; }
 }
 .logo-srf:hover .srf-logo-img { opacity: .82; }
 
+/* TMC actual logo image */
+.tmc-logo-img {
+  height: 36px; width: auto;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  transition: opacity .2s;
+}
+.logo-tmc:hover .tmc-logo-img { opacity: .82; }
+
 /* Why / How confirm row */
 .why-how-row {
   display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
