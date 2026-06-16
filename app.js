@@ -52,6 +52,16 @@ const SOPS = [
     <i class="fa-solid fa-circle-info"></i>
     <p>Verify that the Operational MIS is up to date before starting. If new batches have been added or ended, the sheet must reflect those changes first.</p>
   </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>The P&L is only as accurate as its inputs. If the batch list is outdated or payroll figures are stale, every downstream sheet — Revenue, COGS, Manpower — will carry that error forward and produce a wrong EBITDA.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Check the last-edited date on each source sheet. Confirm with Ms. Nikhitha / Mr. Sidhant that the batch list is current. Verify new batches added since last month's P&L are reflected in the MIS.</p>
+    </div>
+  </div>
 </div>`
       },
       {
@@ -73,7 +83,7 @@ const SOPS = [
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Enter Batch Details</div>
-        <div class="pi-desc">For each active batch, record: Batch name, Client name, Start date, End date (or expected end date), Number of learners, Total fee.</div>
+        <div class="pi-desc">For each active batch, record: Batch name, Client name, Start date, End date, Number of learners, Total fee.</div>
       </div>
     </div>
     <div class="process-item">
@@ -86,17 +96,8 @@ const SOPS = [
     <div class="process-item">
       <div class="pi-num">4</div>
       <div class="pi-content">
-        <div class="pi-title">Calculate Working Days</div>
-        <div class="pi-desc">Use Excel's NETWORKDAYS function for both total course duration and current month portion:<br>
-        <code>=NETWORKDAYS(start_date, end_date)</code> — total course workdays<br>
-        <code>=NETWORKDAYS(month_start, month_end)</code> — current month workdays</div>
-      </div>
-    </div>
-    <div class="process-item">
-      <div class="pi-num">5</div>
-      <div class="pi-content">
         <div class="pi-title">Apply Revenue Proration Formula</div>
-        <div class="pi-desc">The total working days = 100% of course revenue. The month's share is proportional:</div>
+        <div class="pi-desc">Use NETWORKDAYS to calculate workdays, then prorate proportionally.</div>
       </div>
     </div>
   </div>
@@ -107,12 +108,21 @@ const SOPS = [
       <div class="fb-row"><span class="fb-key">Month WD</span><span class="fb-val">Working days falling in the current month for this batch</span></div>
       <div class="fb-row"><span class="fb-key">Total WD</span><span class="fb-val">Full working days across the entire course duration</span></div>
       <div class="fb-row"><span class="fb-key">Course Fee</span><span class="fb-val">Total fee for the entire batch</span></div>
-      <div class="fb-row"><span class="fb-key">Result</span><span class="fb-val">Monthly revenue attributed to this batch</span></div>
     </div>
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Currency Conversion:</strong> If the batch fee is in USD (or any foreign currency), convert to INR using the prevailing exchange rate before entering into the model.</p>
+    <p><strong>Currency Conversion:</strong> If the batch fee is in USD, convert to INR using the prevailing exchange rate before entering into the model.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Revenue is the topline — every downstream metric (Gross Profit, EBITDA, Burn) depends on it. Proration ensures we recognise only the portion of revenue <strong>earned in this month</strong>, not the full course fee, preventing over- or under-statement.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Cross-check total revenue against the Operational MIS batch list — every active batch must appear. Manually verify NETWORKDAYS output for at least 2 batches. Confirm foreign-currency batches are converted to INR.</p>
+    </div>
   </div>
 </div>`
       },
@@ -132,14 +142,14 @@ const SOPS = [
       <div class="pi-num">1</div>
       <div class="pi-content">
         <div class="pi-title">Pull Teacher Details from Operational MIS</div>
-        <div class="pi-desc">From the Teachers tab, get: teacher name, assigned course, total teaching hours for the course, and cost per hour. Check if the teacher is on payroll — if yes, skip them here.</div>
+        <div class="pi-desc">From the Teachers tab, get: teacher name, assigned course, total teaching hours, and cost per hour. Check if the teacher is on payroll — if yes, skip them here.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Calculate Monthly Teaching Hours</div>
-        <div class="pi-desc">Prorate the teaching hours to the current month using the same workday logic as revenue:</div>
+        <div class="pi-desc">Prorate the teaching hours to the current month using the same workday logic as revenue.</div>
       </div>
     </div>
   </div>
@@ -153,9 +163,15 @@ const SOPS = [
       <div class="fb-row"><span class="fb-key">Cost/Hr</span><span class="fb-val">Hourly rate charged by the consultant teacher</span></div>
     </div>
   </div>
-  <div class="info-box tip">
-    <i class="fa-solid fa-circle-info"></i>
-    <p>If RTD revenue was included in the Revenue sheet, ensure the corresponding RTD consultant costs are entered here as well.</p>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>COGS directly reduces Gross Profit. Missing a consultant or accidentally including a payroll teacher will misstate both Contribution Margin and Gross Profit, giving management a false picture of delivery profitability.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Every consultant teacher in the Revenue sheet must have a COGS entry here. Cross-verify names in the Operational MIS Teachers tab. Confirm <strong>zero payroll teachers</strong> appear in this sheet.</p>
+    </div>
   </div>
 </div>`
       },
@@ -187,6 +203,16 @@ const SOPS = [
     <i class="fa-solid fa-circle-check"></i>
     <p>Salaries are pre-forecasted through <strong>March 2027</strong> in the payroll sheet, so future months can be populated quickly without re-calculating from scratch.</p>
   </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Payroll is typically the largest cost category in any month. Capturing it accurately by department (Ops / G&A / S&M) ensures the P&L correctly breaks down costs for management reporting and budget-vs-actual comparisons.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Total salary cost in this sheet must match the TMC Payroll Google Sheet for the month. Cross-check the Axis bank statement to confirm the disbursement amounts and dates are consistent with what's entered here.</p>
+    </div>
+  </div>
 </div>`
       },
       {
@@ -200,22 +226,32 @@ const SOPS = [
     <div class="cat-box cat-gold">
       <div class="cat-box-icon"><i class="fa-solid fa-file-contract"></i></div>
       <h4>Professional Charges</h4>
-      <p>Legal, audit and advisory fees — assumed based on cashflow data</p>
+      <p>Legal, audit and advisory fees — from cashflow data</p>
     </div>
     <div class="cat-box cat-blue">
       <div class="cat-box-icon"><i class="fa-solid fa-bullhorn"></i></div>
       <h4>S&amp;M Charges</h4>
-      <p>Software tools, travel expenses, and other sales &amp; marketing costs (from cashflow)</p>
+      <p>Software tools, travel and other sales &amp; marketing costs</p>
     </div>
     <div class="cat-box cat-green">
       <div class="cat-box-icon"><i class="fa-solid fa-building"></i></div>
       <h4>G&amp;A Overheads</h4>
-      <p>Courier, telephone, printing, internet, office rent, miscellaneous — all from cashflow</p>
+      <p>Courier, telephone, printing, internet, office rent, misc</p>
     </div>
   </div>
   <div class="info-box tip">
     <i class="fa-solid fa-lightbulb"></i>
-    <p>Always pull these numbers from the finalized Cashflow Forecast to ensure consistency between the two models. Do not independently estimate these figures.</p>
+    <p>Always pull these numbers from the finalized Cashflow Forecast. Do not independently estimate these figures — both models must show identical values.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>OPEX determines EBITDA. If expense figures here differ from the Cashflow model, management will see two conflicting numbers — one in the P&L and one in the cashflow. Both models must be in sync to maintain credibility.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Every expense line must have a matching entry in the Cashflow Forecast file. Spot-check <strong>3–4 line items</strong> to verify both models show identical values for the same month.</p>
+    </div>
   </div>
 </div>`
       },
@@ -238,7 +274,17 @@ const SOPS = [
   </div>
   <div class="info-box success">
     <i class="fa-solid fa-star"></i>
-    <p><strong>EBITDA</strong> is the primary management metric. The <strong>Total Burn</strong> metric tracks total cash consumed in operations each month and is a key input for the Cashflow model.</p>
+    <p><strong>EBITDA</strong> is the primary management metric. <strong>Total Burn</strong> tracks total cash consumed each month and feeds into the Cashflow model.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>The Final P&L is the output management and investors see. Any error from upstream sheets surfaces here. A wrong EBITDA or burn figure directly impacts decisions around hiring, spending, and fundraising.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Manually verify: <strong>EBITDA = Revenue − COGS − Manpower − OPEX</strong>. Total Burn should match cashflow outflows. Compare with last month's P&L to ensure YTD figures are directionally consistent.</p>
+    </div>
   </div>
 </div>`
       },
@@ -254,7 +300,7 @@ const SOPS = [
       <div class="pi-num">1</div>
       <div class="pi-content">
         <div class="pi-title">Internal Review — Mr. Vinay</div>
-        <div class="pi-desc">Reviewes the model for accuracy of inputs, formula consistency and reasonableness of outputs.</div>
+        <div class="pi-desc">Reviews the model for accuracy of inputs, formula consistency, and reasonableness of outputs.</div>
       </div>
     </div>
     <div class="process-item">
@@ -268,7 +314,7 @@ const SOPS = [
       <div class="pi-num">3</div>
       <div class="pi-content">
         <div class="pi-title">Version Control & Filing</div>
-        <div class="pi-desc">Save the file following the naming convention and update the version log:<br><code>TMC_PnL_ProForma_2026/06_V1.0.xlsx</code></div>
+        <div class="pi-desc">Save the file following the naming convention:<br><code>TMC_PnL_ProForma_2026/06_V1.0.xlsx</code></div>
       </div>
     </div>
   </div>
@@ -282,6 +328,16 @@ const SOPS = [
       <div class="cat-box-icon"><i class="fa-regular fa-clock"></i></div>
       <h4>Frequency</h4>
       <p>Monthly update — Finance Team responsible</p>
+    </div>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>A formal sign-off protects TMC from circulating inaccurate financial data internally or externally. It also creates an audit trail — if a number is questioned later, there is a clear record of who approved what and when.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Both Mr. Vinay and Mr. Karthik have reviewed and signed off. Version number is logged in the file. File is saved with the correct naming convention in the designated Google Drive folder.</p>
     </div>
   </div>
 </div>`
@@ -316,24 +372,30 @@ const SOPS = [
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Convert Output if Needed</div>
-        <div class="pi-desc">If Claude returns the data as an Excel file, open it in Google Sheets by uploading to Google Drive and selecting "Open with Google Sheets."</div>
+        <div class="pi-desc">If Claude returns the data as an Excel file, upload to Google Drive and select "Open with Google Sheets."</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">3</div>
       <div class="pi-content">
         <div class="pi-title">Paste into Original Dash Looker File</div>
-        <div class="pi-desc">Copy the updated data and paste it into the <strong>original</strong> CF Dash Looker file. This is critical — replacing the source file would require reconnecting every dashboard section individually, which is very time consuming.</div>
+        <div class="pi-desc">Copy the updated data and paste it into the <strong>original</strong> CF Dash Looker file. Never replace the file — that breaks all dashboard connections.</div>
       </div>
     </div>
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Never replace the source Google Sheet file.</strong> Always paste new data into the existing file. Changing the file breaks all dashboard connections.</p>
+    <p><strong>Never replace the source Google Sheet file.</strong> Always paste new data into the existing file. Replacing the file disconnects every chart and table on all 3 dashboard sheets.</p>
   </div>
-  <div class="info-box tip">
-    <i class="fa-solid fa-circle-info"></i>
-    <p>This process is triggered every time the Cashflow Forecast is updated or when a new forecast is being shared with TMC.</p>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>The dashboard only reflects what is in the source Google Sheet. If the Dash Looker file has stale data, all 3 sheets will show wrong figures to management — and they will be making decisions based on outdated numbers.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>After pasting, open the Dash Looker Google Sheet and spot-check <strong>2–3 specific cells</strong> (e.g., current month closing balance, total receipts) against the original Cashflow file. They must match exactly.</p>
+    </div>
   </div>
 </div>`
       },
@@ -349,29 +411,39 @@ const SOPS = [
       <div class="pi-num">1</div>
       <div class="pi-content">
         <div class="pi-title">Add a New Data Source</div>
-        <div class="pi-desc">Click <strong>"Add Data"</strong> at the top of the Looker Studio dashboard → select <strong>Google Sheets</strong> → choose the Dash Looker file (must be in the same Google Drive account as the dashboard).</div>
+        <div class="pi-desc">Click <strong>"Add Data"</strong> at the top → select <strong>Google Sheets</strong> → choose the Dash Looker file from the same Google Drive account as the dashboard.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Select the Correct Sheet Tab</div>
-        <div class="pi-desc">After selecting the file, choose which sheet tab to connect (e.g. CF Summary, CF Inflows, MIS Summary, etc.).</div>
+        <div class="pi-desc">After selecting the file, choose which tab to connect (e.g. CF Summary, CF Inflows, MIS Summary, etc.).</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">3</div>
       <div class="pi-content">
         <div class="pi-title">Reconnect an Existing Section</div>
-        <div class="pi-desc">Click the section on the dashboard → go to <strong>Setup</strong> (right panel) → click the data source icon → click <strong>Edit Connection</strong> → click <strong>Reconnect</strong>. Change the sheet tab selection before reconnecting if needed.</div>
+        <div class="pi-desc">Click the section → <strong>Setup</strong> panel (right) → data source icon → <strong>Edit Connection</strong> → <strong>Reconnect</strong>.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">4</div>
       <div class="pi-content">
         <div class="pi-title">Refresh Data After Updates</div>
-        <div class="pi-desc"><strong>Method 1:</strong> Click the three-dot menu (top right of dashboard) → Refresh Data. Works most of the time.<br><strong>Method 2:</strong> If Method 1 doesn't work, reconnect the sheet and refresh the browser tab.</div>
+        <div class="pi-desc"><strong>Method 1:</strong> Three-dot menu → Refresh Data.<br><strong>Method 2 (if Method 1 fails):</strong> Reconnect the sheet, then refresh the browser tab.</div>
       </div>
+    </div>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>A disconnected section displays an error or blank panel — making the dashboard unusable for that section. Live connections also ensure the dashboard auto-reflects source data changes without needing manual rebuilds each time.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Click each chart or table and verify the data source in the <strong>Setup panel</strong> points to the correct sheet tab. Every section must show data — zero error states or blank panels across all 3 sheets.</p>
     </div>
   </div>
 </div>`
@@ -387,13 +459,13 @@ const SOPS = [
     <div class="section-card">
       <div class="sc-num">§ 1</div>
       <h4>Revenue Trend</h4>
-      <p>Bar chart showing monthly revenue trend. Each bar = 1 month. Number of bars is configurable.</p>
+      <p>Bar chart showing monthly revenue trend. Number of bars is configurable.</p>
       <div class="sc-source">Source: MIS Summary Sheet</div>
     </div>
     <div class="section-card">
       <div class="sc-num">§ 2</div>
       <h4>Concise P&amp;L</h4>
-      <p>Key metrics at a glance: Revenue, COGS, Gross Profit, S&amp;M, G&amp;A, and EBITDA.</p>
+      <p>Key metrics: Revenue, COGS, Gross Profit, S&amp;M, G&amp;A, EBITDA.</p>
       <div class="sc-source">Source: MIS Summary Sheet</div>
     </div>
     <div class="section-card">
@@ -411,7 +483,7 @@ const SOPS = [
     <div class="section-card">
       <div class="sc-num">§ 5</div>
       <h4>Ledger Level Breakup</h4>
-      <p><strong>Interactive:</strong> Select any month to see all individual costs incurred in that period.</p>
+      <p><strong>Interactive:</strong> Select any month to see all individual costs incurred.</p>
       <div class="sc-source">Source: MIS Expenses Sheet</div>
     </div>
     <div class="section-card">
@@ -419,6 +491,16 @@ const SOPS = [
       <h4>Salaries Breakup</h4>
       <p>Detailed salary expenses for the selected month with full employee-level detail.</p>
       <div class="sc-source">Source: MIS Salaries Sheet</div>
+    </div>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Sheet 1 is the primary P&L view for management. It must reflect the latest MIS data so leadership can track revenue trends, cost composition, and profitability at a glance — without opening the raw Excel files.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Revenue Trend bars must match MIS Summary sheet values. The Concise P&L must match the Final P&L from the P&L Proforma model. <strong>Test the interactive month selector</strong> on Sections 5 and 6 — it must filter correctly.</p>
     </div>
   </div>
 </div>`
@@ -446,26 +528,36 @@ const SOPS = [
     <div class="section-card">
       <div class="sc-num">§ 3</div>
       <h4>Expense Type Pie Chart</h4>
-      <p>Visual pie chart showing which cost category (COGS, G&amp;A, S&amp;M) contributes the most.</p>
+      <p>Visual pie showing which cost category (COGS, G&amp;A, S&amp;M) contributes the most.</p>
       <div class="sc-source">Source: CF Exp Detailed</div>
     </div>
     <div class="section-card">
       <div class="sc-num">§ 4</div>
-      <h4>COGS / G&amp;A / S&amp;M Pie</h4>
-      <p><strong>Interactive:</strong> Select a category to drill down into all individual costs within it.</p>
+      <h4>COGS / G&amp;A / S&amp;M Drill-down</h4>
+      <p><strong>Interactive:</strong> Select a category to see all individual costs within it.</p>
       <div class="sc-source">Source: CF Exp Detailed</div>
     </div>
     <div class="section-card">
       <div class="sc-num">§ 5</div>
       <h4>Expense Breakup</h4>
-      <p>Software, marketing, general and consultant expenses — all in one consolidated view.</p>
+      <p>Software, marketing, general and consultant expenses in one consolidated view.</p>
       <div class="sc-source">Source: CF Exp Detailed</div>
     </div>
     <div class="section-card">
       <div class="sc-num">§ 6</div>
       <h4>Salaries Breakup</h4>
-      <p>Full salary breakdown for the selected month across all three salary categories.</p>
+      <p>Full salary breakdown for the selected month across all three categories.</p>
       <div class="sc-source">Source: CF Salaries</div>
+    </div>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Month-level cashflow detail is critical for understanding exactly where cash came from and where it went. This view helps identify unusual payments, missing inflows, or timing mismatches at a granular level.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p><strong>Opening balance</strong> must equal last month's closing balance. <strong>Closing balance</strong> must match the actual combined bank balance (Axis + HSBC) as of that month end.</p>
     </div>
   </div>
 </div>`
@@ -481,26 +573,32 @@ const SOPS = [
     <div class="section-card" style="grid-column: span 2">
       <div class="sc-num">§ 1</div>
       <h4>Receipts vs Outflows</h4>
-      <p>A bar chart comparing monthly cash inflows vs outflows across the selected period. Instantly highlights months where burn exceeds income. Number of months displayed is configurable.</p>
+      <p>A bar chart comparing monthly cash inflows vs outflows across the selected period. Instantly highlights months where burn exceeds income.</p>
       <div class="sc-source">Source: CF Summary Sheet</div>
     </div>
     <div class="section-card" style="grid-column: span 2">
       <div class="sc-num">§ 2</div>
       <h4>Net Burn with Runway (Combo Chart)</h4>
-      <p>A two-layer combination chart: the <strong>bar graph</strong> shows Net Burn per month; the <strong>line graph</strong> overlaid shows the forecasted Runway in months.</p>
+      <p>The <strong>bar graph</strong> shows Net Burn per month; the <strong>line graph</strong> overlaid shows forecasted Runway in months.</p>
     </div>
   </div>
   <div class="formula-block">
     <div class="formula-label">Key Metrics — Sheet 3</div>
     <div class="formula-expr">Net Burn = Outflows − Inflows</div>
     <div class="formula-expr" style="margin-top:8px">Runway = Closing Cash Balance ÷ Average Monthly Net Burn</div>
-    <div class="formula-breakdown" style="margin-top:12px">
-      <div class="fb-row"><span class="fb-key">Net Burn</span><span class="fb-val">How much cash the business consumed in the month (negative = burning cash)</span></div>
-      <div class="fb-row"><span class="fb-key">Runway</span><span class="fb-val">Months of cash remaining at the current burn rate — critical for fundraising decisions</span></div>
-    </div>
   </div>
   <div class="chart-wrap" style="margin-top:16px">
     <canvas id="trendChart" height="120"></canvas>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Trend data is what management and investors study most. Runway is the single most critical metric — it determines fundraising urgency, hiring decisions, and how aggressively TMC can invest in growth.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Net Burn figures must match the opening-minus-closing difference in the Cashflow file. Runway must equal <strong>Closing Balance ÷ Average Monthly Net Burn</strong>. Verify both manually for the latest month.</p>
+    </div>
   </div>
 </div>`
       },
@@ -516,7 +614,7 @@ const SOPS = [
       <div class="pi-num">1</div>
       <div class="pi-content">
         <div class="pi-title">Refresh the Dashboard</div>
-        <div class="pi-desc">Click the three-dot menu (top right) → <strong>Refresh Data</strong>. This updates all charts and tables with the latest figures from the Google Sheet.</div>
+        <div class="pi-desc">Click the three-dot menu (top right) → <strong>Refresh Data</strong>. This updates all charts and tables with the latest figures.</div>
       </div>
     </div>
     <div class="process-item">
@@ -530,20 +628,30 @@ const SOPS = [
       <div class="pi-num">3</div>
       <div class="pi-content">
         <div class="pi-title">Stress Test All 3 Sheets</div>
-        <div class="pi-desc">Check every section on all three sheets. Verify numbers match the source Google Sheet. Click interactive filters to ensure they work correctly.</div>
+        <div class="pi-desc">Check every section. Verify numbers match the source Google Sheet. Click interactive filters to confirm they work correctly.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">4</div>
       <div class="pi-content">
         <div class="pi-title">Share with Mr. Varun</div>
-        <div class="pi-desc">Send the dashboard link to Mr. Varun. This step is done every time the cashflow is updated or a new forecast is being shared with TMC.</div>
+        <div class="pi-desc">Send the dashboard link to Mr. Varun. Done every time the cashflow is updated or a new forecast is being shared.</div>
       </div>
     </div>
   </div>
   <div class="info-box success">
     <i class="fa-solid fa-circle-check"></i>
     <p><strong>Version:</strong> V1.0 · <strong>Effective:</strong> 8th June 2026 · <strong>Frequency:</strong> Monthly + on every cashflow update</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Sharing a stale or untested dashboard risks sending incorrect figures to management, which could directly influence wrong business decisions. A proper test catches stale data, broken connections, or filter errors before they reach the client.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>All 3 sheets load without errors. Interactive filters on Sheet 1 (Ledger Breakup) and Sheet 2 (Expense drill-down) respond correctly. <strong>Confirm Mr. Varun has received the link and confirmed access.</strong></p>
+    </div>
   </div>
 </div>`
       }
@@ -574,12 +682,22 @@ const SOPS = [
     <div class="bank-card hsbc">
       <div class="bank-card-icon"><i class="fa-solid fa-university"></i></div>
       <h4>HSBC — Expense Account</h4>
-      <p>Majority of all expenses are paid from here.<br><br><strong>How to get:</strong> Zoho Books → Reports → Bank Transactions → Set custom date range → Export (top-right button).</p>
+      <p>Majority of all expenses are paid from here.<br><br><strong>How to get:</strong> Zoho Books → Reports → Bank Transactions → Set custom date range → Export.</p>
     </div>
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Foreign Currency:</strong> Bills may be in USD, EUR or other currencies, but bank statements always show the amount in <strong>INR</strong> — the bank converts automatically. The original foreign currency amount is visible in the transaction description.</p>
+    <p><strong>Foreign Currency:</strong> Bills may be in USD or EUR, but bank statements always show the INR equivalent. The original foreign currency amount is visible in the transaction description.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Bank statements are the ground truth for the cashflow model. Every actual transaction must reconcile against them. Without both statements, the final check row (model vs. bank) cannot be verified and the model remains unvalidated.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>You must have: (1) Axis Bank PDF from Ms. Brinda with the password, AND (2) HSBC export from Zoho Books. Both must cover the <strong>full calendar month</strong> being updated — no gaps in dates.</p>
+    </div>
   </div>
 </div>`
       },
@@ -609,12 +727,18 @@ const SOPS = [
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Critical — Salary Timing Rule:</strong> Salaries are paid in the same month <em>only if the last day of the month is a working day</em>. If the month-end falls on a weekend or public holiday, salaries are paid on the <strong>first working day of the following month</strong>.<br><br>
-    <strong>Example:</strong> May's salary was credited in June because the last working day of May fell on a Sunday. This has a significant impact on cashflow accuracy.</p>
+    <p><strong>Critical — Salary Timing Rule:</strong> Salaries are paid in the same month <em>only if the last day of the month is a working day</em>. If month-end falls on a weekend or public holiday, salaries are paid on the <strong>first working day of the following month</strong>.<br><br>
+    <strong>Example:</strong> May's salary was credited in June because the last working day of May fell on a Sunday.</p>
   </div>
-  <div class="info-box tip">
-    <i class="fa-solid fa-check-double"></i>
-    <p><strong>Verification:</strong> Cross-check salary amounts against both the <strong>Axis bank statement</strong> AND the <strong>TMC Payroll Google Sheet</strong> to ensure figures match.</p>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Payroll is the single largest outflow every month. Getting the timing wrong due to a month-end holiday can misstate the closing balance by lakhs — directly causing the check row to fail and the model to appear incorrect.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Total payroll must match the corresponding debit(s) in the <strong>Axis bank statement</strong>. Verify which month the salary was debited — confirm the correct-month vs. next-month rule was applied based on the last working day.</p>
+    </div>
   </div>
 </div>`
       },
@@ -637,17 +761,27 @@ const SOPS = [
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Reimbursement Sheet — Categorize Invoices</div>
-        <div class="pi-desc">Reimbursement totals come from the TMC Payroll Sheet. Open each attached invoice and categorize it: food, travel, internet, courier, printing, etc. These feed directly into the Expense Breakup sheet.</div>
+        <div class="pi-desc">Reimbursement totals come from the TMC Payroll Sheet. Open each attached invoice and categorize it: food, travel, internet, courier, printing, etc.</div>
       </div>
     </div>
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Sahil (Special Rule):</strong> Sahil is paid <strong>₹10,000/month</strong> as consultant fees. Any <em>additional</em> amount credited to him is TDS — this must be accounted for separately in the Expense Breakup sheet, not in the Consultant sheet.</p>
+    <p><strong>Sahil (Special Rule):</strong> Sahil is paid <strong>₹10,000/month</strong> as consultant fees. Any <em>additional</em> amount credited to him is TDS — this must be entered in the Expense Breakup sheet separately, not here.</p>
   </div>
   <div class="info-box success">
     <i class="fa-solid fa-robot"></i>
-    <p><strong>Claude Tip — Large Invoice Volumes:</strong> If there are many invoices to categorize, download them all into a folder and give Claude folder access along with the reimbursement sheet. Claude will categorize all invoices into the existing categories automatically. Always <strong>recheck the total</strong> against the reimbursement sheet amount.</p>
+    <p><strong>Claude Tip:</strong> For large invoice volumes, give Claude folder access along with the reimbursement sheet. Claude will categorize all invoices automatically. Always <strong>recheck the total</strong> against the reimbursement sheet amount.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Consultant and reimbursement costs are frequently missed or miscategorized. Even one skipped consultant invoice or a wrongly placed reimbursement will cause the final check row to be non-zero, requiring a full trace-back through all sheets.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Total reimbursements must match the reimbursement total in the TMC Payroll Sheet. For Sahil: ₹10,000 in Consultant sheet only — TDS goes to Expense Breakup. Claude's categorization total must be verified against the payroll sheet figure.</p>
+    </div>
   </div>
 </div>`
       },
@@ -666,41 +800,47 @@ const SOPS = [
     <span class="tag-pill">Internet</span>
     <span class="tag-pill">Salary Arrears</span>
     <span class="tag-pill">Travel</span>
-    <span class="tag-pill">Other G&amp;A (food/rent)</span>
+    <span class="tag-pill">Other G&amp;A</span>
     <span class="tag-pill">Deposit Lock</span>
     <span class="tag-pill">Marketing</span>
-    <span class="tag-pill">Assets (Laptops etc.)</span>
+    <span class="tag-pill">Assets</span>
   </div>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>Expense Timing Rule — Same as Salary:</strong> Current month expenses are <em>paid in the next month</em>. For example, May's expenses were recorded in June (along with June's own expenses). This must be consistently applied for the cashflow to be accurate.</p>
+    <p><strong>Expense Timing Rule:</strong> Current month expenses are <em>paid in the next month</em>. For example, May's expenses were recorded in June. This must be consistently applied for the cashflow to be accurate.</p>
   </div>
   <div class="process-list">
     <div class="process-item">
       <div class="pi-num">!</div>
       <div class="pi-content">
         <div class="pi-title">Rent — Variable Amount</div>
-        <div class="pi-desc">Rent varies each month because TMC uses a co-working office space. The amount charged depends on the number of people working in the office that month. Confirm the headcount for each month.</div>
+        <div class="pi-desc">Varies each month based on headcount at the co-working office. Confirm headcount before entering the rent figure.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">!</div>
       <div class="pi-content">
         <div class="pi-title">Ad Hoc Travel</div>
-        <div class="pi-desc">Refers specifically to <strong>Mr. Varun's business visits</strong>. These are irregular and must be confirmed with him or found in reimbursement records.</div>
+        <div class="pi-desc">Refers to <strong>Mr. Varun's business visits</strong>. Irregular — confirm with him or check reimbursement records.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">!</div>
       <div class="pi-content">
         <div class="pi-title">Marketing</div>
-        <div class="pi-desc">Marketing is a <strong>one-time annual expense</strong> — not a monthly recurring cost. Do not spread it across months unless explicitly agreed.</div>
+        <div class="pi-desc">A <strong>one-time annual expense</strong> — not monthly. Do not spread it across months unless explicitly agreed.</div>
       </div>
     </div>
   </div>
-  <div class="info-box tip">
-    <i class="fa-solid fa-circle-info"></i>
-    <p>Printing, internet, courier, food and travel figures mostly come from the <strong>Reimbursements sheet</strong>. Ensure the reimbursement data is finalized before filling this sheet.</p>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>This sheet drives all OPEX lines in the main Cashflow. Uncategorized or missing expenses here cause the closing balance to not reconcile with the bank. Every expense must also be in the right month per the timing rule.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Sum of all categories must equal total expense outflows in the bank statements (excluding salary and consultant payments). Spot-check: rent amount must match the co-working invoice. Marketing must appear only in the month it was paid.</p>
+    </div>
   </div>
 </div>`
       },
@@ -711,37 +851,34 @@ const SOPS = [
         content: `
 <div class="step-body">
   <p class="step-intro">B2B (Language Training) is TMC's primary revenue stream. The B2B sheet has <strong>Confirmed Revenue</strong>, <strong>Pipeline Revenue</strong>, and <strong>B2B Payments</strong>. Key contacts: <strong>Ms. Nikhitha Joshi &amp; Mr. Sidhant</strong>.</p>
-  <div class="info-box info">
-    <i class="fa-solid fa-circle-dot"></i>
-    <p><strong>Confirmed Revenue:</strong> Active and completed courses. Dates and course data from Operational MIS. The assigned teacher is visible in the Teachers tab.</p>
-  </div>
   <div class="formula-block">
     <div class="formula-label">B2B Revenue — 50/50 Payment Model</div>
     <div class="formula-expr">= Batch Size × Fee per Student × 50% × FX Rate</div>
     <div class="formula-breakdown">
       <div class="fb-row"><span class="fb-key">Example</span><span class="fb-val"><code>=15 × 270 × 50% × 93</code></span></div>
-      <div class="fb-row"><span class="fb-key">15</span><span class="fb-val">Batch size — 15 students in this batch</span></div>
-      <div class="fb-row"><span class="fb-key">270</span><span class="fb-val">Fee per student in USD</span></div>
-      <div class="fb-row"><span class="fb-key">50%</span><span class="fb-val">First payment — 50% received when course starts</span></div>
-      <div class="fb-row"><span class="fb-key">93</span><span class="fb-val">USD to INR conversion rate</span></div>
+      <div class="fb-row"><span class="fb-key">50%</span><span class="fb-val">First payment received when course starts — remaining 50% at course end</span></div>
+      <div class="fb-row"><span class="fb-key">Timing</span><span class="fb-val">Payment received in the month <em>after</em> the start/end event, not the same month</span></div>
     </div>
-  </div>
-  <div class="info-box warning">
-    <i class="fa-solid fa-calendar"></i>
-    <p><strong>Payment Timing:</strong> If a batch starts in April, the first 50% is received in <strong>May</strong>. If the course ends in September, the final 50% is received in <strong>October</strong>. Revenue is never recognized in the start/end month itself — always the following month.</p>
   </div>
   <div class="info-box info">
     <i class="fa-solid fa-seedling"></i>
-    <p><strong>Pipeline Revenue:</strong> Batches expected to start in coming months. Assume a <strong>60% conversion rate</strong> — i.e., 60% of pipeline batches will actually confirm and start.</p>
+    <p><strong>Pipeline Revenue:</strong> Batches expected to start in coming months. Assume a <strong>60% conversion rate</strong> — i.e., 60% of pipeline batches will confirm and start.</p>
   </div>
   <div class="formula-block">
-    <div class="formula-label">B2B Payments — Monthly Model (Consultant Teachers)</div>
+    <div class="formula-label">B2B Payments — Consultant Teachers (Monthly)</div>
     <div class="formula-expr">= Teaching Hours × Rate per Hour × 90%</div>
     <div class="formula-breakdown">
-      <div class="fb-row"><span class="fb-key">Example</span><span class="fb-val"><code>=16 × 1000 × 90%</code></span></div>
-      <div class="fb-row"><span class="fb-key">16</span><span class="fb-val">Hours taught by consultant in the current month</span></div>
-      <div class="fb-row"><span class="fb-key">1000</span><span class="fb-val">Rate per hour charged by the consultant</span></div>
-      <div class="fb-row"><span class="fb-key">90%</span><span class="fb-val">Net after deducting 10% TDS</span></div>
+      <div class="fb-row"><span class="fb-key">90%</span><span class="fb-val">Net of 10% TDS deducted from consultant payments</span></div>
+    </div>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>B2B is TMC's largest revenue stream. Wrong proration, missing batches, or an incorrect pipeline conversion rate will materially distort the cashflow forecast and runway — the two numbers management watches most closely.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Each B2B receipt in the Axis bank statement must have a matching inflow entry. Confirm the batch list with Ms. Nikhitha and Mr. Sidhant. Verify pipeline uses exactly <strong>60% conversion rate</strong>.</p>
     </div>
   </div>
 </div>`
@@ -752,24 +889,32 @@ const SOPS = [
         duration: "~30 min",
         content: `
 <div class="step-body">
-  <p class="step-intro"><strong>RTD = Recruitment, Training &amp; Deployment.</strong> This is TMC's second revenue stream — placing candidates (e.g. nurses) with international clients. Key contact: <strong>Ms. Priyansha</strong>.</p>
+  <p class="step-intro"><strong>RTD = Recruitment, Training &amp; Deployment.</strong> TMC's second revenue stream — placing candidates (e.g. nurses) with international clients. Key contact: <strong>Ms. Priyansha</strong>.</p>
   <div class="formula-block">
     <div class="formula-label">RTD Revenue Formula</div>
     <div class="formula-expr">= No. of Candidates × Fee per Candidate × 50%</div>
     <div class="formula-breakdown">
-      <div class="fb-row"><span class="fb-key">Example</span><span class="fb-val"><code>=8 × 1,00,000 × 50%</code></span></div>
-      <div class="fb-row"><span class="fb-key">8</span><span class="fb-val">Number of nurses (or candidates) required by the client</span></div>
-      <div class="fb-row"><span class="fb-key">₹1,00,000</span><span class="fb-val">Total fee charged per candidate</span></div>
-      <div class="fb-row"><span class="fb-key">50%</span><span class="fb-val">First payment — received when the placement process starts</span></div>
+      <div class="fb-row"><span class="fb-key">Example</span><span class="fb-val"><code>=8 × 1,00,000 × 50%</code> = ₹4,00,000 first payment</span></div>
+      <div class="fb-row"><span class="fb-key">50%</span><span class="fb-val">First payment when placement process starts; 50% at completion</span></div>
     </div>
   </div>
   <div class="info-box info">
     <i class="fa-solid fa-circle-dot"></i>
-    <p>Like B2B, RTD also has <strong>Confirmed</strong> and <strong>Pipeline</strong> sections. The same 50-50 payment model applies: 50% upfront when the process starts, 50% upon completion of placement.</p>
+    <p>Like B2B, RTD has <strong>Confirmed</strong> and <strong>Pipeline</strong> sections. Same 50-50 model: 50% upfront, 50% on placement completion.</p>
   </div>
   <div class="info-box tip">
     <i class="fa-solid fa-file-invoice-dollar"></i>
-    <p><strong>RTD Costs:</strong> The cost section covers consultant charges associated with each RTD placement (sourcing companies, channel partners). Both confirmed and pipeline costs must be entered in the RTD Payments sheet.</p>
+    <p><strong>RTD Costs:</strong> Consultant charges for each RTD placement (sourcing companies, channel partners). Both confirmed and pipeline costs must be entered in the RTD Payments sheet.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>RTD revenue is material — one missed placement of 8 candidates at ₹1L each equals <strong>₹8L of missed inflows</strong>. This directly impacts the runway calculation and could make TMC's cash position look worse than reality.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Verify with Ms. Priyansha that all active placements are captured. Confirmed inflows must have corresponding bank credits. <strong>Pipeline numbers must be validated with Ms. Priyansha</strong> before finalizing — do not assume from last month.</p>
+    </div>
   </div>
 </div>`
       },
@@ -787,11 +932,11 @@ const SOPS = [
     </div>
     <div class="cf-row cf-in">
       <i class="fa-solid fa-arrow-down"></i>
-      <div><strong>+ Receipts (Inflows)</strong><span>Investments + B2B Revenue + RTD Collections + Other Income (interest on late client payments)</span></div>
+      <div><strong>+ Receipts (Inflows)</strong><span>Investments + B2B Revenue + RTD Collections + Other Income</span></div>
     </div>
     <div class="cf-row cf-out">
       <i class="fa-solid fa-arrow-up"></i>
-      <div><strong>− Payments (Outflows)</strong><span>B2B Costs · RTD Costs · Payroll · Travel · Software · G&amp;A · Telecom · Courier · Consultants · Printing · Professional/Legal</span></div>
+      <div><strong>− Payments (Outflows)</strong><span>B2B Costs · RTD Costs · Payroll · Software · G&A · Telecom · Courier · Consultants · Professional/Legal</span></div>
     </div>
     <div class="cf-row cf-calc">
       <i class="fa-solid fa-equals"></i>
@@ -808,7 +953,17 @@ const SOPS = [
   </div>
   <div class="info-box tip">
     <i class="fa-solid fa-circle-info"></i>
-    <p><strong>"Without Pipeline" scenario</strong> gives a more conservative and realistic view of cash position. Always review this scenario first when discussing with management.</p>
+    <p><strong>"Without Pipeline" scenario</strong> gives the most conservative and realistic view. Always review this scenario first when presenting to management.</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>This is the final consolidated view that management and investors see. Every error from upstream sheets surfaces here as a non-zero check row. Getting this right is the culmination of all prior steps — the output directly informs fundraising and spending decisions.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p>Toggle between "With Pipeline" and "Without Pipeline" — both must make logical sense. Gross Burn and Net Burn must be consistent with prior months unless there is a known, documented reason for variance.</p>
+    </div>
   </div>
 </div>`
       },
@@ -821,7 +976,7 @@ const SOPS = [
   <p class="step-intro">The final step is reconciliation — ensuring the model's closing balance matches the actual bank balances to the rupee. <strong>The check row must always equal zero.</strong></p>
   <div class="info-box warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <p><strong>The Golden Rule:</strong><br><code>Closing Balance (Model) − Total Bank Balance (Axis + HSBC) = 0</code><br><br>If the check row is not zero, there is a discrepancy somewhere. Do not share the cashflow until this is resolved.</p>
+    <p><strong>The Golden Rule:</strong><br><code>Closing Balance (Model) − Total Bank Balance (Axis + HSBC) = 0</code><br><br>If the check row is not zero, there is a discrepancy somewhere. <strong>Do not share the cashflow until this is resolved.</strong></p>
   </div>
   <div class="process-list">
     <div class="process-item">
@@ -835,14 +990,14 @@ const SOPS = [
       <div class="pi-num">2</div>
       <div class="pi-content">
         <div class="pi-title">Review Key Metrics</div>
-        <div class="pi-desc"><strong>Gross Burn</strong> = Total Outflows. <strong>Net Burn</strong> = Opening Balance − Closing Balance. Review both to ensure they look reasonable vs prior months.</div>
+        <div class="pi-desc"><strong>Gross Burn</strong> = Total Outflows. <strong>Net Burn</strong> = Opening − Closing. Review both for reasonableness vs prior months.</div>
       </div>
     </div>
     <div class="process-item">
       <div class="pi-num">3</div>
       <div class="pi-content">
         <div class="pi-title">Update the Looker Dashboard</div>
-        <div class="pi-desc">Once validated, update the CF Dash Looker Google Sheet with the new data and refresh the Looker Studio dashboard (refer to SOP 02 for the full process).</div>
+        <div class="pi-desc">Once validated, update the CF Dash Looker Google Sheet and refresh the Looker Studio dashboard (refer to SOP 02 for the full process).</div>
       </div>
     </div>
     <div class="process-item">
@@ -855,7 +1010,17 @@ const SOPS = [
   </div>
   <div class="info-box success">
     <i class="fa-solid fa-circle-check"></i>
-    <p><strong>Version:</strong> V1.0 · <strong>Effective:</strong> 8th June 2026 · <strong>Forecast Horizon:</strong> Through March 2027 · <strong>Frequency:</strong> Monthly + every cashflow update</p>
+    <p><strong>Version:</strong> V1.0 · <strong>Effective:</strong> 8th June 2026 · <strong>Forecast Horizon:</strong> March 2027 · <strong>Frequency:</strong> Monthly + every cashflow update</p>
+  </div>
+  <div class="why-how-row">
+    <div class="why-box">
+      <div class="wh-label"><i class="fa-solid fa-lightbulb"></i> Why this step?</div>
+      <p>Reconciliation is the final quality gate. A non-zero check row is proof something is wrong — a missing transaction, a timing error, or a data entry mistake. Sharing an unreconciled cashflow destroys credibility with the client.</p>
+    </div>
+    <div class="how-box">
+      <div class="wh-label"><i class="fa-solid fa-circle-check"></i> How to confirm?</div>
+      <p><strong>Check row = 0.</strong> Model Closing Balance = Axis Balance + HSBC Balance. If non-zero, trace discrepancy transaction by transaction across each bank statement line vs. the model — do not stop until the source is found.</p>
+    </div>
   </div>
 </div>`
       }
@@ -897,24 +1062,19 @@ function showWorkflow(sopIdx) {
 function gotoStep(idx) {
   currentStep = idx;
   renderStep();
-  // On mobile scroll content into view
   const content = document.querySelector('.wf-content');
   if (content) content.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function prevStep() {
-  if (currentStep > 0) gotoStep(currentStep - 1);
-}
-function nextStep() {
-  if (currentStep < SOPS[currentSOP].steps.length - 1) gotoStep(currentStep + 1);
-}
+function prevStep() { if (currentStep > 0) gotoStep(currentStep - 1); }
+function nextStep() { if (currentStep < SOPS[currentSOP].steps.length - 1) gotoStep(currentStep + 1); }
 
 // ══════════════════════════════════════════════════
 //  BUILD SIDEBAR
 // ══════════════════════════════════════════════════
 function buildSidebar() {
-  const sop   = SOPS[currentSOP];
-  const list  = document.getElementById('stepList');
+  const sop  = SOPS[currentSOP];
+  const list = document.getElementById('stepList');
   list.innerHTML = '';
   sop.steps.forEach((step, i) => {
     const div = document.createElement('div');
@@ -939,13 +1099,9 @@ function renderStep() {
   const step  = sop.steps[currentStep];
   const total = sop.steps.length;
 
-  // Progress bar
   document.getElementById('progressFill').style.width = `${((currentStep + 1) / total) * 100}%`;
+  document.getElementById('stepCounter').textContent  = `Step ${currentStep + 1} of ${total}`;
 
-  // Counter
-  document.getElementById('stepCounter').textContent = `Step ${currentStep + 1} of ${total}`;
-
-  // Step detail
   const detail = document.getElementById('stepDetail');
   detail.innerHTML = `
     <div class="step-title-block">
@@ -958,18 +1114,15 @@ function renderStep() {
     </div>
     ${step.content}`;
 
-  // Sidebar active states
   document.querySelectorAll('.wf-step-item').forEach((el, i) => {
     el.classList.remove('active', 'done');
     if (i === currentStep) el.classList.add('active');
     if (i <  currentStep) el.classList.add('done');
-    // Update icon for done steps
     const circle = el.querySelector('.step-num-circle');
     if (i < currentStep) circle.innerHTML = '<i class="fa-solid fa-check" style="font-size:10px"></i>';
     else circle.textContent = i + 1;
   });
 
-  // Dots
   const dotsEl = document.getElementById('stepDots');
   dotsEl.innerHTML = '';
   for (let i = 0; i < total; i++) {
@@ -980,19 +1133,14 @@ function renderStep() {
     dotsEl.appendChild(d);
   }
 
-  // Nav buttons
   document.getElementById('prevBtn').disabled = currentStep === 0;
   document.getElementById('nextBtn').disabled = currentStep === total - 1;
-  if (currentStep === total - 1) {
-    document.getElementById('nextBtn').innerHTML = '<i class="fa-solid fa-check"></i> Complete';
-  } else {
-    document.getElementById('nextBtn').innerHTML = 'Next Step <i class="fa-solid fa-arrow-right"></i>';
-  }
+  document.getElementById('nextBtn').innerHTML = currentStep === total - 1
+    ? '<i class="fa-solid fa-check"></i> Complete'
+    : 'Next Step <i class="fa-solid fa-arrow-right"></i>';
 
-  // Destroy old chart before possibly making a new one
   if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
 
-  // Render inline chart if the step has one
   setTimeout(() => {
     const canvas = document.getElementById('trendChart');
     if (canvas && !trendChartInstance) {
@@ -1018,9 +1166,7 @@ function renderStep() {
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { labels: { color: '#94a3b8', font: { size: 12 } } }
-          },
+          plugins: { legend: { labels: { color: '#94a3b8', font: { size: 12 } } } },
           scales: {
             x:  { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
             yB: { position: 'left',  grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#f87171', callback: v => '₹'+v+'L' } },
