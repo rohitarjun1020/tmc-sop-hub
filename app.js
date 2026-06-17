@@ -1108,7 +1108,7 @@ function renderStep() {
       <div class="step-num-label">Step ${currentStep + 1} · ${sop.title}</div>
       <div class="step-main-title">${step.title}</div>
       <div class="step-meta">
-        <div class="step-meta-item"><i class="fa-solid fa-user"></i> <strong>${step.owner}</strong></div>
+        ${step.owner.includes('Rohit') ? '' : `<div class="step-meta-item"><i class="fa-solid fa-user"></i> <strong>${step.owner}</strong></div>`}
         <div class="step-meta-item"><i class="fa-regular fa-clock"></i> <strong>${step.duration}</strong></div>
       </div>
     </div>
