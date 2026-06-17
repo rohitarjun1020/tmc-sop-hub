@@ -1085,7 +1085,7 @@ function buildSidebar() {
       <div class="step-num-circle">${i + 1}</div>
       <div class="step-item-text">
         <div class="step-item-title">${step.title}</div>
-        <div class="step-item-owner">${step.owner}</div>
+        ${step.owner.includes('Rohit') ? '' : `<div class="step-item-owner">${step.owner}</div>`}
       </div>`;
     list.appendChild(div);
   });
